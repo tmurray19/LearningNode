@@ -27,7 +27,6 @@ app.get('/messages', (req, res) => {
 app.post('/messages', async (req, res) => {
 
     try {
-        throw 'error'
         // Gets message from text file
         var message = new Message(req.body)
 
