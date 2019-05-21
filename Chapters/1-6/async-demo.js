@@ -4,6 +4,7 @@
 
 fs = require('fs');
 
+// This code runs as it is available
 function phoneNumber(err, data) {
     console.log('data: ', data);
 };
