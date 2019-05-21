@@ -24,34 +24,34 @@ app.get('/messages', (req, res) => {
     })
 });
 
-app.post('/messages', (req, res) => {
+app.post('/messages', async (req, res) => {
     // console.log(req.body)
 
     // Gets message from text file
     var message = new Message(req.body)
 
     // Save the message in the database
-    message.save()
-    .then(() => {
-        console.log('Saved.')
-        return Message.findOne({message: 'badword'})
-    })
+    var savedMessage = await message.save()
+
+    console.log('Saved.')
+
+    var censored = await Message.findOne({ message: 'badword' })
     // Checks to see if a message needs to be censored
-    .then( censored => {
-        if(censored) {
-            console.log('Censored word found: ', censored)
-            return Message.remove({_id: censored.id})
-        }
-        // Otherwise, it shows the message
+    if(censored) {
+        console.log('Message censored.')
+        await Message.deleteOne({ _id: censored.id })
+    }
+    // Otherwise, it shows the message
+    else
         io.emit('message', req.body)
-        res.sendStatus(200)
-    })
+    res.sendStatus(200)
     // For catching errors
+    /*
     .catch((err) => {
         res.sendStatus(500)
         return console.error(err)
     })
-
+    */
 });
 
 io.on('connection', (socket) => {
