@@ -25,33 +25,37 @@ app.get('/messages', (req, res) => {
 });
 
 app.post('/messages', async (req, res) => {
-    // console.log(req.body)
 
-    // Gets message from text file
-    var message = new Message(req.body)
+    try {
+        throw 'error'
+        // Gets message from text file
+        var message = new Message(req.body)
 
-    // Save the message in the database
-    var savedMessage = await message.save()
+        // Save the message in the database
+        var savedMessage = await message.save()
 
-    console.log('Saved.')
+        console.log('Saved.')
 
-    var censored = await Message.findOne({ message: 'badword' })
-    // Checks to see if a message needs to be censored
-    if(censored) {
-        console.log('Message censored.')
-        await Message.deleteOne({ _id: censored.id })
-    }
-    // Otherwise, it shows the message
-    else
-        io.emit('message', req.body)
-    res.sendStatus(200)
-    // For catching errors
-    /*
-    .catch((err) => {
+        var censored = await Message.findOne({ message: 'badword' })
+        // Checks to see if a message needs to be censored
+        if(censored) {
+            console.log('Message censored.')
+            await Message.deleteOne({ _id: censored.id })
+        }
+        // Otherwise, it shows the message
+        else
+            io.emit('message', req.body)
+        res.sendStatus(200)
+
+    } catch (error) {
         res.sendStatus(500)
-        return console.error(err)
-    })
-    */
+        return console.error(error)
+    } finally {
+        // Some possible uses for finally block
+        // logger.log('Message post called')
+        // console.log('Message post called.')
+    }
+
 });
 
 io.on('connection', (socket) => {
